@@ -5,15 +5,55 @@ import player
 import alien
 import threading
 import time
+import random
 import weapon
 
 class gameobjs():
     
-    def __init__(self): 
+    def __init__(self,scr): 
         self.dir_path = os.path.dirname(os.path.realpath(__file__)) + os.sep
         self.gamerunning = True
         self.gameevents = []
         self.playerenergy = 200
+        self.scr = scr
+        self.switchlevel(1, 0, 0)
+
+    def switchlevel(self,lvlnum, playerx, playery):
+        self.buildlevel = level.Level(self.scr, lvlnum)
+        self.currentlevel = lvlnum
+        self.musicfile = self.buildlevel.lvlobjects.levelobj['musicfile']
+        if playerx < 1:
+                self.playerx = self.buildlevel.lvlobjects.levelobj['playerstartpos'][0]
+                self.playery = self.buildlevel.lvlobjects.levelobj['playerstartpos'][1]
+        else:
+            self.playerx = playerx
+            self.playery = playery
+        self.aliendict = self.buildlevel.lvlobjects.levelobj['aliens']
+        self.exitsdict = self.buildlevel.lvlobjects.levelobj['exits']
+
+        self.player1 = player.Player(screen, self.dir_path + "player2.png", self.buildlevel.col.rects,self.playerx,self.playery, self.playerenergy)
+        self.player1.setpos(2)
+            
+        self.laser = weapon.Weapon(screen, self.player1)
+
+        self.alienarray = []
+        for a in self.aliendict:
+            x = a['pos'][0]
+            y = a['pos'][1]
+            self.alienarray.append(alien.Alien(screen, self.dir_path + "magier1.png", self.buildlevel.col.rects, x, y, self.player1, self.laser, 0, 100))
+        
+        self.exitrects = []
+        for e in self.exitsdict:
+            x = e['pos'][0]
+            y = e['pos'][1]
+            self.exitrects.append(pygame.Rect(x * 32, y * 32, 32, 32))
+
+        pygame.mixer.music.load(self.dir_path + self.musicfile)
+        pygame.mixer.music.play(loops= - 1)
+
+    def aliendeadenergy(self):
+        if self.player1.energy < 150:
+            self.player1.energy += random.randint(0, 50)
 
 class gameloop(threading.Thread): 
     
@@ -31,18 +71,18 @@ class gameloop(threading.Thread):
                 self.handleinput()
                 
                 if self.shoot == True:
-                    laser.shot(player1, True)
+                    gobj.laser.shot(gobj.player1, True)
                 else:
-                    laser.shot(player1, False)
+                    gobj.laser.shot(gobj.player1, False)
                     
                 if self.mtop == True:
-                    player1.moveup()
+                    gobj.player1.moveup()
                 if self.mright == True:
-                    player1.moveright()
+                    gobj.player1.moveright()
                 if self.mleft == True:
-                    player1.moveleft()
+                    gobj.player1.moveleft()
                 if self.mdown == True:
-                    player1.movedown() 
+                    gobj.player1.movedown() 
   
             except:
                 print("mope")
@@ -85,17 +125,17 @@ class gameloop(threading.Thread):
         pygame.draw.rect(screen, (0, 0, 0), framerect)
         pygame.draw.rect(screen, (255, 0, 0), energyrect)
         framerect = pygame.Rect(32, 554, 102, 10)
-        energyrect = pygame.Rect(33, 555, laser.energy, 8)
+        energyrect = pygame.Rect(33, 555, gobj.laser.energy, 8)
         pygame.draw.rect(screen, (0, 0, 0), framerect)
         pygame.draw.rect(screen, (0, 255, 0), energyrect)
-        gobj.playerenergy = player1.energy
+        gobj.playerenergy = gobj.player1.energy
 
 
 if __name__ == '__main__':
 
     pygame.init()
     
-    #pygame.display.set_caption("Raumsonde Gate3k")
+    pygame.display.set_caption("Aliengame 0.1.23, by Thomasg")
 
     screen = pygame.display.set_mode((800,576),  pygame.DOUBLEBUF | pygame.SCALED) #pygame.DOUBLEBUF
 
@@ -110,34 +150,11 @@ if __name__ == '__main__':
     
     clock = pygame.time.Clock()
     
-    gobj = gameobjs()
-
-    buildlevel = level.Level(screen, 1)
-    musicfile = buildlevel.lvlobjects.levelobj['musicfile']
-    playerx = buildlevel.lvlobjects.levelobj['playerstartpos'][0]
-    playery = buildlevel.lvlobjects.levelobj['playerstartpos'][1]
-    alienjson = buildlevel.lvlobjects.levelobj['aliens']
-
-    playerenergy = 200
-    player1 = player.Player(screen, gobj.dir_path + "player2.png", buildlevel.col.rects,20,11, playerenergy)
-    player1.setpos(2)
-        
-    laser = weapon.Weapon(screen, player1)
-
-    alienarray = []
-    for a in alienjson:
-        x = a['pos'][0]
-        y = a['pos'][1]
-        alienarray.append(alien.Alien(screen, gobj.dir_path + "magier1.png", buildlevel.col.rects, x, y, player1, laser, 0, 100))
-
-
-    pygame.mixer.music.load(gobj.dir_path + musicfile)
-    pygame.mixer.music.play(loops= - 1)
+    gobj = gameobjs(screen)
     
     tgameloop = gameloop()
     tgameloop.start()
-    
-    print(buildlevel.lvlobjects.levelobj)
+
     while gobj.gamerunning == True:
 
         gobj.gameevents = []
@@ -148,14 +165,27 @@ if __name__ == '__main__':
             
         screen.fill((0,0,0))
         
-        buildlevel.drawlayers()
-        player1.drawplayer()
-        buildlevel.drawupperlayer()
-        
-        for a in alienarray:
-            a.process(player1, laser, gobj.gameevents)
+        gobj.buildlevel.drawlayers()
+        gobj.player1.drawplayer()   
 
-        #TODO: handle level exits :D
+        for i in range(0,len(gobj.alienarray)):
+            gobj.alienarray[i].process(gobj.player1, gobj.laser, gobj.gameevents)
+            if gobj.alienarray[i].aliendead == True:
+                print("alien down!")
+                gobj.alienarray.pop(i)
+                gobj.aliendeadenergy()
+                break
+
+        gobj.buildlevel.drawupperlayer()
+
+        for e in range(0,len(gobj.exitsdict)):
+            if gobj.exitrects[e].colliderect(gobj.player1.rect):
+                tolvl = gobj.exitsdict[e]['tolvl']
+                print("found! To lvl: ", tolvl)
+                px = gobj.exitsdict[e]['playerpos'][0]
+                py = gobj.exitsdict[e]['playerpos'][1]
+                gobj.switchlevel(tolvl,px,py)
+                break
         
         tgameloop.handleenergy()
         

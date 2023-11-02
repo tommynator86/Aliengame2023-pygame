@@ -19,7 +19,7 @@ class Level:
         self.draw_layer(2, self.buffersurface)
         self.draw_layer(3, self.buffersurface2)
         self.col = Collision(self.lvldata["layers"][4])
-        self.lvlobjects = LVLObjects(wpath + 'level1.lvlobj')
+        self.lvlobjects = LVLObjects(wpath + 'level' + str(levelnum) + '.lvlobj')
         
     def loadlvlfile(self, levelfile):
         lf = open(levelfile, 'r')

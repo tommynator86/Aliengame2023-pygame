@@ -1,1 +1,1 @@
-{"musicfile": "lvl1.mp3", "playerstartpos": [20, 11], "aliens": [{"pos": [6, 13]}, {"pos": [13, 3]}], "exits": [{"tolvl": 2, "pos": [4, 17]}]}
+{"musicfile": "lvl1.mp3", "playerstartpos": [20, 11], "aliens": [{"pos": [6, 13]}, {"pos": [13, 3]}], "exits": [{"tolvl": 2, "pos": [4, 17], "playerpos": [3, 5]}]}
