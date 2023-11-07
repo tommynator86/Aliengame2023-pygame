@@ -7,6 +7,7 @@ import threading
 import time
 import random
 import weapon
+import fireball
 
 class gameobjs():
     
@@ -47,6 +48,19 @@ class gameobjs():
             x = e['pos'][0]
             y = e['pos'][1]
             self.exitrects.append(pygame.Rect(x * 32, y * 32, 32, 32))
+
+        self.fireballs = []
+        try:
+            self.fbdict = self.buildlevel.lvlobjects.levelobj['fireballs']
+            for f in self.fbdict:
+                x = f['pos'][0]
+                y = f['pos'][1]
+                auto = f['auto']
+                direction = f['dir']
+                self.fireballs.append(fireball.Fireball(screen, self.dir_path + "fireball.png", x, y, self.buildlevel.col.rects,direction,auto))
+        except:
+            print("no fireball enemys")
+
 
         pygame.mixer.music.load(self.dir_path + self.musicfile)
         pygame.mixer.music.play(loops= - 1)
@@ -155,6 +169,9 @@ if __name__ == '__main__':
     tgameloop = gameloop()
     tgameloop.start()
 
+    # debug fireball
+    #fb = fireball.Fireball(screen, gobj.dir_path + "fireball.png", 1, 13, gobj.buildlevel.col.rects,0,True)
+
     while gobj.gamerunning == True:
 
         gobj.gameevents = []
@@ -166,7 +183,10 @@ if __name__ == '__main__':
         screen.fill((0,0,0))
         
         gobj.buildlevel.drawlayers()
-        gobj.player1.drawplayer()   
+        gobj.player1.drawplayer()
+
+        #debug fireball
+        #fb.process(gobj.player1,gobj.gameevents)   
 
         for i in range(0,len(gobj.alienarray)):
             gobj.alienarray[i].process(gobj.player1, gobj.laser, gobj.gameevents)
@@ -175,6 +195,9 @@ if __name__ == '__main__':
                 gobj.alienarray.pop(i)
                 gobj.aliendeadenergy()
                 break
+
+        for j in range(0,len(gobj.fireballs)):
+            gobj.fireballs[j].process(gobj.player1,gobj.gameevents)  
 
         gobj.buildlevel.drawupperlayer()
 
@@ -191,5 +214,7 @@ if __name__ == '__main__':
         
         pygame.display.flip()
         clock.tick(60)
+
+        #pygame.display.set_caption("FPS: " + str(clock.get_fps()))
     
     pygame.quit()
