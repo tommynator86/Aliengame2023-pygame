@@ -78,6 +78,10 @@ class gameloop(threading.Thread):
         self.mtop = False
         self.mdown = False
         self.shoot = False
+        self.joystick_count = pygame.joystick.get_count()
+        if self.joystick_count > 0:
+            self.joystick = pygame.joystick.Joystick(0)
+            print("Joystick found!")
      
     def run(self): 
         while gobj.gamerunning == True:
@@ -103,6 +107,7 @@ class gameloop(threading.Thread):
             time.sleep(0.009)
 
     def handleinput(self):
+
         for event in gobj.gameevents:
             if event.type == pygame.QUIT:
                 gobj.gamerunning = False
@@ -132,6 +137,33 @@ class gameloop(threading.Thread):
                     self.mleft = False
                 if  event.key == pygame.K_SPACE:
                     self.shoot = False
+
+            if self.joystick_count > 0:
+                if event.type == pygame.JOYBUTTONDOWN:
+                    if event.button == 0: self.shoot = True
+                if event.type == pygame.JOYBUTTONUP:
+                    if event.button == 0: self.shoot = False
+
+                if event.type == pygame.JOYAXISMOTION:
+                    axis0 = self.joystick.get_axis(0)
+                    axis1 = self.joystick.get_axis(1)
+                    if axis0 < -0.5:
+                        self.mleft = True
+                    else:
+                        self.mleft = False
+                    if axis0 > 0.5:
+                        self.mright = True
+                    else:
+                        self.mright = False
+                    if axis1 < -0.5:
+                        self.mtop = True
+                    else:
+                        self.mtop = False
+                    if axis1 > 0.5:
+                        self.mdown = True
+                    else:
+                        self.mdown = False
+
                     
     def handleenergy(self):
         framerect = pygame.Rect(32, 544, 202, 10)
