@@ -52,7 +52,7 @@ addfireball(1,11,0,True)
 data["exits"] = []
 addexit(4, 17, 2, 3, 5)
 
-createlvlobj(data, 1)
+#createlvlobj(data, 1)
 
 # Level 2
 data = dict()
@@ -83,8 +83,50 @@ addfireball(24,9,1,False)
 
 data["exits"] = []
 addexit(3, 0, 2, 20 ,16)
+addexit(24, 10, 4, 1 ,8)
 #addexit(20, 17, 1, 0 , 0)
 
 #createlvlobj(data, 3)
 
 
+# Level 4
+data = dict()
+data["musicfile"] = "lvl1.mp3"
+data["playerstartpos"] = [3,5]
+
+data["aliens"] = []
+addalien(9, 8)
+#addalien(20, 9)
+
+#data["fireballs"] = []
+#addfireball(24,9,1,False)
+
+data["exits"] = []
+# Gullideckel 4ever
+addexit(4, 4, 3, 4 ,9)
+addexit(9, 4, 3, 4 ,9)
+addexit(14, 4, 3, 4 ,9)
+addexit(4, 13, 3, 4 ,9)
+addexit(9, 13, 5, 7 ,9)
+addexit(14, 13, 3, 4 ,9)
+
+addexit(0, 9, 3, 23 ,11)
+
+createlvlobj(data, 4)
+
+# Level 5
+data = dict()
+data["musicfile"] = "lvl1.mp3"
+data["playerstartpos"] = [3,5]
+
+data["aliens"] = []
+addalien(3, 12)
+addalien(14, 12)
+
+data["fireballs"] = []
+addfireball(23,16,3,False)
+
+data["exits"] = []
+addexit(24, 9, 3, 4 ,9)
+
+createlvlobj(data, 5)

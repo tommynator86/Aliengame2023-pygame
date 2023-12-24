@@ -1,0 +1,1 @@
+{"musicfile": "lvl1.mp3", "playerstartpos": [3, 5], "aliens": [{"pos": [3, 12]}, {"pos": [14, 12]}], "fireballs": [{"pos": [23, 16], "dir": 3, "auto": false}], "exits": [{"tolvl": 3, "pos": [24, 9], "playerpos": [4, 9]}]}

@@ -183,7 +183,7 @@ if __name__ == '__main__':
     
     pygame.display.set_caption("Aliengame 0.1.23, by Thomasg")
 
-    screen = pygame.display.set_mode((800,576),  pygame.DOUBLEBUF | pygame.SCALED) #pygame.DOUBLEBUF
+    screen = pygame.display.set_mode((800,576),  pygame.DOUBLEBUF | pygame.SCALED | pygame.FULLSCREEN) #pygame.DOUBLEBUF
 
     #print("Treiber: " + str(pygame.display.get_driver()))
     #print("Videoinfo: " + str(pygame.display.Info()))
