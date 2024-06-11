@@ -78,13 +78,22 @@ class gameloop(threading.Thread):
         self.mtop = False
         self.mdown = False
         self.shoot = False
+     
         self.joystick_count = pygame.joystick.get_count()
         if self.joystick_count > 0:
             self.joystick = pygame.joystick.Joystick(0)
             print("Joystick found!")
+    
+        self.rect_top = pygame.Rect(15, 0, 20, 20)
+        self.rect_left = pygame.Rect(0, 25, 20, 20)
+        self.rect_right = pygame.Rect(45, 25, 20, 20)
+        self.rect_down = pygame.Rect(15, 45, 20, 20)
+        self.rect_shoot = pygame.Rect(50, 50, 50, 50)
+        self.fingers = {}
      
     def run(self): 
         while gobj.gamerunning == True:
+          
             try:
                 self.handleinput()
                 
@@ -101,9 +110,10 @@ class gameloop(threading.Thread):
                     gobj.player1.moveleft()
                 if self.mdown == True:
                     gobj.player1.movedown() 
-  
+
             except:
                 print("mope")
+                   
             time.sleep(0.009)
 
     def handleinput(self):
@@ -138,6 +148,15 @@ class gameloop(threading.Thread):
                 if  event.key == pygame.K_SPACE:
                     self.shoot = False
 
+            if event.type == pygame.FINGERDOWN:
+                x = event.x * 100
+                y = event.y * 100
+                finger_id = event.finger_id
+                self.fingers[finger_id] = x, y
+
+            if event.type == pygame.FINGERUP:
+                self.fingers.pop(event.finger_id, None)
+
             if self.joystick_count > 0:
                 if event.type == pygame.JOYBUTTONDOWN:
                     if event.button == 0: self.shoot = True
@@ -163,6 +182,29 @@ class gameloop(threading.Thread):
                         self.mdown = True
                     else:
                         self.mdown = False
+        
+        # Handle Touch Events    
+        for finger, pos in self.fingers.items():
+            if self.rect_top.collidepoint(pos):
+                self.mtop = True
+            else:
+                self.mtop = False
+            if self.rect_left.collidepoint(pos):
+                self.mleft = True
+            else:
+                self.mleft = False
+            if self.rect_right.collidepoint(pos):
+                self.mright = True
+            else:
+                self.mright = False
+            if self.rect_down.collidepoint(pos):
+                self.mdown = True
+            else:
+                self.mdown = False
+            if self.rect_shoot.collidepoint(pos):
+                self.shoot = True
+            else:
+                self.shoot = False
 
                     
     def handleenergy(self):
@@ -210,7 +252,7 @@ if __name__ == '__main__':
         for gameevent in pygame.event.get():
             gobj.gameevents.append(gameevent)
         
-        pygame.event.pump()    
+        #pygame.event.pump()    
             
         screen.fill((0,0,0))
         
